@@ -1,0 +1,45 @@
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=places&key=API_KEY"></script>
+<script type="text/javascript">
+    function DrawMap() {
+        var geocoder = new google.maps.Geocoder();
+        var address = document.getElementById('txtPostalCode').value;
+        geocoder.geocode({ 'address': address }, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                if (results[0].types[0] == 'postal_code') {
+                    var latitude = results[0].geometry.location.lat();
+                    var longitude = results[0].geometry.location.lng();
+                    var data = {};
+                    data.title = results[0].formatted_address;
+                    data.lat = latitude;
+                    data.lng = longitude;
+                    var mapOptions = { center: new google.maps.LatLng(latitude, longitude), zoom: 18, mapTypeId: google.maps.MapTypeId.ROADMAP };
+                    var infoWindow = new google.maps.InfoWindow();
+                    var map = new google.maps.Map(document.getElementById("dvMap"), mapOptions);
+                    var myLatlng = new google.maps.LatLng(data.lat, data.lng);
+                    var marker = new google.maps.Marker({ position: myLatlng, map: map, title: data.title });
+                    (function (marker, data) {
+                        google.maps.event.addListener(marker, "click", function (e) {
+                            infoWindow.setContent("<div style = 'width:200px;height:50px'>" + data.title + "</div>");
+                            infoWindow.open(map, marker);
+                        });
+                    })(marker, data);
+                    document.getElementById("dvMap").style.display = "block";
+                } else {
+                    document.getElementById("dvMap").style.display = "none";
+                    alert("Your post code is not correct.\nPlease update your correct postcode.");
+                }
+            } else {
+                document.getElementById("dvMap").style.display = "none";
+                alert("Your post code is not correct.\nPlease update your correct postcode.");
+            }
+        });
+    };
+</script>
+<center>
+    <input type="text" id="txtPostalCode" onchange="DrawMap()" placeholder="Enter Postal / Zip / Pin code"
+        style="width: 200px" />
+    <br />
+    <br />
+    <div id="dvMap" style="width: 300px; height: 400px">
+    </div>
+</center>
